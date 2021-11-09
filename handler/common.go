@@ -79,3 +79,14 @@ func getNextID() int {
 	lp := productList[len(productList)-1]
 	return lp.ID + 1
 }
+
+func DeleteProduct(id int) error {
+	_, i, err := findProduct(id)
+	if err != nil {
+		return ErrProductNotFound
+	}
+
+	productList = append(productList[:i], productList[i+1:]...)
+
+	return nil
+}
