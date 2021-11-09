@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -30,14 +29,12 @@ func DeleteProducts(w http.ResponseWriter, r *http.Request) {
 
 	err = DeleteProduct(id)
 	if err == ErrProductNotFound {
-		fmt.Printf("[ERROR] deleting record id does not exist")
 		w.WriteHeader(http.StatusNotFound)
 		http.Error(w, "Product not found", http.StatusNotFound)
 		return
 	}
 
 	if err != nil {
-		fmt.Printf("[ERROR] deleting record", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		http.Error(w, "Product not found", http.StatusInternalServerError)
 		return
