@@ -22,8 +22,25 @@ func main() {
 		Addr:    fmt.Sprintf(":%v", os.Getenv("API_PORT")),
 		Handler: loggedRouter,
 	}
-	fmt.Printf("Server is running on : %v", os.Getenv("API_PORT"))
-	if err := s.ListenAndServe(); err != nil {
-		fmt.Errorf("Server failed to start : %s", err)
-	}
+	go func() {
+		fmt.Printf("Server is running on : %v\n", os.Getenv("API_PORT"))
+
+		if err := s.ListenAndServe(); err != nil {
+			fmt.Errorf("Server failed to start : %s\n", err)
+			os.Exit(1)
+		}
+	}()
+
+	// trap sigterm or interupt and gracefully shutdown the server
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	signal.Notify(c, os.Kill)
+
+	// Block until a signal is received.
+	sig := <-c
+	log.Println("Got signal:", sig)
+
+	// gracefully shutdown the server, waiting max 30 seconds for current operations to complete
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	s.Shutdown(ctx)
 }
